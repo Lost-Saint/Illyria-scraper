@@ -1,8 +1,8 @@
-import { mapGoogleCode, type LangCode } from "./utils/language.js";
-import request, { Endpoint } from "./utils/request.js";
-import * as parse from "./utils/parse.js";
-import type { Boilerplate, Data } from "./utils/types.js";
-import type { TranslationInfo } from "./utils/interfaces.js";
+import { mapGoogleCode, type LangCode } from './utils/language.js'
+import request, { Endpoint } from './utils/request.js'
+import * as parse from './utils/parse.js'
+import type { Boilerplate, Data } from './utils/types.js'
+import type { TranslationInfo } from './utils/interfaces.js'
 
 /**
  * Retrieves the full translation information given a pair of languages and a query
@@ -12,38 +12,39 @@ import type { TranslationInfo } from "./utils/interfaces.js";
  * @returns An element with all the information, as defined in {@link TranslationInfo}
  */
 export const getTranslationInfo = async (
-    source: LangCode<"source">,
-    target: LangCode<"target">,
-    query: string
+	source: LangCode<'source'>,
+	target: LangCode<'target'>,
+	query: string
 ): Promise<TranslationInfo | null> => {
-    const parsedSource = mapGoogleCode(source);
-    const parsedTarget = mapGoogleCode(target);
+	const parsedSource = mapGoogleCode(source)
+	const parsedTarget = mapGoogleCode(target)
 
-    const reqData = JSON.stringify([[query, parsedSource, parsedTarget, true], [null]]);
-    const reqBoilerplate = JSON.stringify([[["MkEWBc", reqData, null, "generic"]]]);
-    const body = "f.req=" + encodeURIComponent(reqBoilerplate);
+	const reqData = JSON.stringify([[query, parsedSource, parsedTarget, true], [null]])
+	const reqBoilerplate = JSON.stringify([[['MkEWBc', reqData, null, 'generic']]])
+	const body = 'f.req=' + encodeURIComponent(reqBoilerplate)
 
-    return request(Endpoint.INFO)
-        .with({ body })
-        .doing(({ data }) => {
-            const resBoilerplate: Boilerplate = JSON.parse(data?.split("\n")?.[3]);
-            const resData: Data = JSON.parse(resBoilerplate?.[0]?.[2]);
-            if (!resData)
-                return;
+	return request(Endpoint.INFO)
+		.with({ body })
+		.doing(({ data }) => {
+			const resBoilerplate: Boilerplate = JSON.parse(data?.split('\n')?.[3])
+			const resData: Data = JSON.parse(resBoilerplate?.[0]?.[2])
+			if (!resData) {
+				return
+			}
 
-            return parse.undefinedFields({
-                detectedSource: source === "auto"
-                    ? parse.detected(resData)
-                    : undefined,
-                typo: parse.typo(resData),
-                pronunciation: {
-                    query: parse.pronunciation.query(resData),
-                    translation: parse.pronunciation.translation(resData)
-                },
-                definitions: parse.list.definitions(resData),
-                examples: parse.list.examples(resData),
-                similar: parse.list.similar(resData),
-                extraTranslations: parse.list.translations(resData),
-            });
-        });
-};
+			return parse.undefinedFields({
+				detectedSource: source === 'auto'
+					? parse.detected(resData)
+					: undefined,
+				typo: parse.typo(resData),
+				pronunciation: {
+					query: parse.pronunciation.query(resData),
+					translation: parse.pronunciation.translation(resData)
+				},
+				definitions: parse.list.definitions(resData),
+				examples: parse.list.examples(resData),
+				similar: parse.list.similar(resData),
+				extraTranslations: parse.list.translations(resData)
+			})
+		})
+}

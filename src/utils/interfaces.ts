@@ -1,34 +1,34 @@
-import type { LangCode } from "./language.js";
+import type { LangCode } from './language.js'
 
 interface DefinitionsGroup {
-    type: string,
-    list: {
-        definition: string,
-        example: string,
-        field?: string,
-        synonyms: string[]
-    }[]
+	type: string
+	list: {
+		definition: string
+		example: string
+		field?: string
+		synonyms: string[]
+	}[]
 }
 
 interface ExtraTranslationsGroup {
-    type: string,
-    list: {
-        word: string,
-        article?: string,
-        frequency: number,
-        meanings: string[]
-    }[]
+	type: string
+	list: {
+		word: string
+		article?: string
+		frequency: number
+		meanings: string[]
+	}[]
 }
 
 export interface TranslationInfo {
-    detectedSource?: LangCode<"source">,
-    typo?: string,
-    pronunciation: {
-        query?: string,
-        translation?: string
-    },
-    definitions: DefinitionsGroup[],
-    examples: string[],
-    similar: string[],
-    extraTranslations: ExtraTranslationsGroup[]
+	detectedSource?: LangCode<'source'>
+	typo?: string
+	pronunciation: {
+		query?: string
+		translation?: string
+	}
+	definitions: DefinitionsGroup[]
+	examples: string[]
+	similar: string[]
+	extraTranslations: ExtraTranslationsGroup[]
 }
