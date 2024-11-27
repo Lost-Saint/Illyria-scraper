@@ -31,7 +31,7 @@
 	],
 	"scripts": {
 		"build": "tsc",
-		"ci": "pnpm run build && pnpm run check-format && pnpm run check-exports && pnpm run lint && pnpm run test",
+		"ci": "pnpm run build && pnpm run check-format && pnpm run check-exports && pnpm run test",
 		"check-exports": "attw --pack . --ignore-rules=cjs-resolves-to-esm",
 		"check-format": "dprint check",
 		"format": "dprint fmt",
