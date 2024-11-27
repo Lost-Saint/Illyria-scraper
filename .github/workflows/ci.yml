@@ -16,19 +16,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
 
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: "pnpm"
 
-      - name: Install pnpm
-        run: |
-          curl -fsSL https://get.pnpm.io/install.sh | sh -
-          export PATH=$HOME/.local/share/pnpm/global/5/node_modules/.bin:$PATH
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-      - name: Install dependencies with pnpm
-        run: pnpm install
-
-      - name: Run CI tasks with pnpm
+      - name: Run CI
         run: pnpm run ci
