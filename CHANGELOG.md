@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.0.3
+
+### Patch Changes
+
+- cd1b681: update syntax for cheerio
+
 ## 1.0.2
 
 ### Patch Changes
