@@ -20,10 +20,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "ci": "pnpm run build",
+    "check-exports": "attw --pack .",
+    "local-release": "pnpm run ci && changeset version && changeset publish"
   },
   "type": "module",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.17.0",
     "typescript": "^5.7.2"
   }
 }
