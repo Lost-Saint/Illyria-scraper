@@ -13,6 +13,7 @@
     "extractor"
   ],
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "homepage": "https://github.com/Lost-Saint/Illyria-scraper",
   "private": false,
@@ -35,6 +36,7 @@
     "check-format": "dprint check",
     "format": "dprint fmt",
     "test": "vitest run",
+    "prepublishOnly": "pnpm run ci",
     "local-release": "pnpm run ci && changeset version && changeset publish"
   },
   "type": "module",
