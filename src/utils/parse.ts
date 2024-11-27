@@ -1,6 +1,6 @@
-import { Data } from "./types";
-import { mapLingvaCode } from "./language";
-import { TranslationInfo } from "./interfaces";
+import type { Data } from "./types.js";
+import { mapLingvaCode } from "./language.js";
+import type { TranslationInfo } from "./interfaces.js";
 
 export const detected = ([source, target, detected, extra]: Data): TranslationInfo["detectedSource"] => {
     const code = source?.[2] ?? target?.[3] ?? detected ?? extra?.[8] ?? extra?.[5]?.[0]?.[0]?.[3];

@@ -1,5 +1,5 @@
-import { mapGoogleCode, LangCode } from "./utils/language";
-import request, { Endpoint } from "./utils/request";
+import { mapGoogleCode, type LangCode } from "./utils/language.js";
+import request, { Endpoint } from "./utils/request.js";
 
 /**
  * Retrieves an audio buffer of the given text in the given language

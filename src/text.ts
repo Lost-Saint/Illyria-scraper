@@ -1,6 +1,6 @@
-import cheerio from "cheerio";
-import { mapGoogleCode, LangCode } from "./utils/language";
-import request, { Endpoint } from "./utils/request";
+import * as cheerio from 'cheerio';
+import { mapGoogleCode, type LangCode } from "./utils/language.js";
+import request, { Endpoint } from "./utils/request.js";
 
 /**
  * Retrieves the translation given a pair of languages and a query

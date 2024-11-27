@@ -1,4 +1,4 @@
-import { LangCodeGoogle } from "./language";
+import type { LangCodeGoogle } from "./language.js";
 
 export type Boilerplate = [
     [

@@ -1,8 +1,8 @@
-import { mapGoogleCode, LangCode } from "./utils/language";
-import request, { Endpoint } from "./utils/request";
-import * as parse from "./utils/parse";
-import { Boilerplate, Data } from "./utils/types";
-import { TranslationInfo } from "./utils/interfaces";
+import { mapGoogleCode, type LangCode } from "./utils/language.js";
+import request, { Endpoint } from "./utils/request.js";
+import * as parse from "./utils/parse.js";
+import type { Boilerplate, Data } from "./utils/types.js";
+import type { TranslationInfo } from "./utils/interfaces.js";
 
 /**
  * Retrieves the full translation information given a pair of languages and a query

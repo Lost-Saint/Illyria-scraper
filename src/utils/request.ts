@@ -1,6 +1,6 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { type AxiosResponse } from "axios";
 import UserAgent from "user-agents";
-import { LangCodeGoogle } from "./language";
+import type { LangCodeGoogle } from "./language.js";
 
 export const Endpoint = {
     INFO: "info",
