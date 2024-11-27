@@ -17,6 +17,7 @@
 
 		/* If transpiling with TypeScript: */
 		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
 		"lib": ["es2022"],
 		"outDir": "dist",
 		"rootDir": "src",
