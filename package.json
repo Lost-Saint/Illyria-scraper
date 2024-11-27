@@ -6,6 +6,7 @@
     "demo",
     "typescript"
   ],
+  "main": "dist/index.js",
   "homepage": "https://github.com/Lost-Saint/Illyria-scraper",
   "bugs": {
     "url": "https://github.com/Lost-Saint/Illyria-scraper/issues"
@@ -21,13 +22,19 @@
   ],
   "scripts": {
     "build": "tsc",
-    "ci": "pnpm run build",
-    "check-exports": "attw --pack .",
+    "ci": "pnpm run build && pnpm run check-format && pnpm run check-exports && pnpm run lint && pnpm run test",
+    "check-exports": "attw --pack . --ignore-rules=cjs-resolves-to-esm",
+    "check-format": "dprint check",
+    "format": "dprint fmt",
+    "test": "vitest run",
     "local-release": "pnpm run ci && changeset version && changeset publish"
   },
   "type": "module",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.0",
-    "typescript": "^5.7.2"
+    "@changesets/cli": "^2.27.10",
+    "dprint": "^0.47.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.6"
   }
 }
