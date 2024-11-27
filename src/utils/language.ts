@@ -1,4 +1,4 @@
-import { languages, exceptions, mappings } from "./languages.json";
+import { languages, exceptions, mappings } from "./languages.json" assert { type: 'json' };
 
 export const LanguageType = {
     SOURCE: "source",
