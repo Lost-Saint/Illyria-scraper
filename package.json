@@ -2,9 +2,12 @@
   "name": "illyria-scraper",
   "version": "1.0.0",
   "description": "",
-  "keywords": ["demo", "typescript"],
+  "keywords": [
+    "demo",
+    "typescript"
+  ],
   "homepage": "https://github.com/Lost-Saint/Illyria-scraper",
-   "bugs": {
+  "bugs": {
     "url": "https://github.com/Lost-Saint/Illyria-scraper/issues"
   },
   "author": "Lost Saint",
@@ -13,6 +16,14 @@
     "url": "git+https://github.com/Lost-Saint/Illyria-scraper.git"
   },
   "license": "GLWTS",
-  "files": ["dist"],
-  "type": "module"
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
 }
