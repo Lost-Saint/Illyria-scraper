@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.0.2
+
+### Patch Changes
+
+- f2a1b94: replace asserts
+
 ## 1.0.1
 
 ### Patch Changes
