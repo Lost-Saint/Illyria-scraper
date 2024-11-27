@@ -1,4 +1,4 @@
-import * as languagesData from './languages.json' assert { type: 'json' }
+import * as languagesData from './languages.json' with { type: 'json' }
 
 const { languages, exceptions, mappings } = languagesData.default
 
