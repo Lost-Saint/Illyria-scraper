@@ -2,11 +2,17 @@
   "name": "illyria-scraper",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "keywords": ["demo", "typescript"],
+  "homepage": "https://github.com/Lost-Saint/Illyria-scraper",
+   "bugs": {
+    "url": "https://github.com/Lost-Saint/Illyria-scraper/issues"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "Lost Saint",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lost-Saint/Illyria-scraper.git"
+  },
+  "license": "GLWTS",
+  "files": ["dist"],
+  "type": "module"
 }
