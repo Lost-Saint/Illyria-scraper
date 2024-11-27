@@ -1,8 +1,26 @@
 {
-  "typescript": {
-  },
-  "json": {
-  },
+	"lineWidth": 120,
+	"useTabs": true,
+	"indentWidth": 4,
+	"incremental": true,
+	"typescript": {
+		"indentWidth": 4,
+		"quoteStyle": "preferSingle",
+		"binaryExpression.operatorPosition": "sameLine",
+		"semiColons": "asi",
+		"useTabs": true,
+		"trailingCommas": "never",
+		"module.sortImportDeclarations": "maintain",
+		"importDeclaration.sortNamedImports": "maintain",
+		"operatorPosition": "maintain",
+		"jsx.quoteStyle": "preferDouble",
+		"jsx.bracketPosition": "maintain",
+		"functionDeclaration.spaceBeforeParentheses": true
+	},
+	"json": {
+		"indentWidth": 2,
+		"useTabs": true
+	},
   "excludes": [
     "**/node_modules",
     "**/*-lock.json"
