@@ -14,9 +14,9 @@ importers:
       cheerio:
         specifier: ^1.0.0
         version: 1.0.0
-      user-agent:
-        specifier: ^1.0.4
-        version: 1.0.4
+      user-agents:
+        specifier: ^1.1.371
+        version: 1.1.371
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.17.0
@@ -797,6 +797,9 @@ packages:
     resolution: {integrity: sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==}
     engines: {node: '>=8'}
 
+  lodash.clonedeep@4.5.0:
+    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
+
   lodash.startcase@4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
 
@@ -1108,8 +1111,8 @@ packages:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
     engines: {node: '>= 4.0.0'}
 
-  user-agent@1.0.4:
-    resolution: {integrity: sha512-NPTnJ89e6ttUK+Q3ZQ6aMFo4+4HAdvsb39IypyRw/bPjE/F8TjeVpB8uqFPnUCVbI6247qPryd8OLpkEYuOwWg==}
+  user-agents@1.1.371:
+    resolution: {integrity: sha512-W8qTEd99M4I6J8Xo8zx3cFUXvfn++NWwIBeyr9Y/QMq6YdUziacSjA2pytWzM+fhRBH6wH99EzYveFlDHPwRcQ==}
 
   validate-npm-package-name@5.0.1:
     resolution: {integrity: sha512-OljLrQ9SQdOUqTaQxqL5dEfZWrXExyyWsozYlAWFawPVNuD83igl7uJD2RTkNMbniIYgt8l81eCJGIdQF7avLQ==}
@@ -1988,6 +1991,8 @@ snapshots:
     dependencies:
       p-locate: 4.1.0
 
+  lodash.clonedeep@4.5.0: {}
+
   lodash.startcase@4.4.0: {}
 
   loupe@3.1.2: {}
@@ -2255,7 +2260,9 @@ snapshots:
 
   universalify@0.1.2: {}
 
-  user-agent@1.0.4: {}
+  user-agents@1.1.371:
+    dependencies:
+      lodash.clonedeep: 4.5.0
 
   validate-npm-package-name@5.0.1: {}
 
