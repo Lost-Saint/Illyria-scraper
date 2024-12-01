@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.0.5
+
+### Patch Changes
+
+- 4bef327: update user-agents
+
 ## 1.0.4
 
 ### Patch Changes
