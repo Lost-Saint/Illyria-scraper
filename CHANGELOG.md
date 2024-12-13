@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.1.0
+
+### Minor Changes
+
+- eb5a35c: bump deps to latest
+
 ## 1.0.5
 
 ### Patch Changes
