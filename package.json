@@ -41,16 +41,16 @@
 	},
 	"type": "module",
 	"devDependencies": {
-		"@arethetypeswrong/cli": "^0.17.2",
-		"@changesets/cli": "^2.27.11",
+		"@arethetypeswrong/cli": "^0.18.1",
+		"@changesets/cli": "^2.29.4",
 		"@types/user-agents": "^1.0.4",
-		"dprint": "^0.48.0",
-		"typescript": "^5.7.2",
-		"vitest": "^2.1.8"
+		"dprint": "^0.50.0",
+		"typescript": "^5.8.3",
+		"vitest": "^3.1.4"
 	},
 	"dependencies": {
-		"axios": "^1.7.9",
+		"axios": "^1.9.0",
 		"cheerio": "^1.0.0",
-		"user-agents": "^1.1.397"
+		"user-agents": "^1.1.553"
 	}
 }
