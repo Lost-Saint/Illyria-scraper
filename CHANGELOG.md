@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.1.2
+
+### Patch Changes
+
+- ed24244: update deps to latest
+
 ## 1.1.1
 
 ### Patch Changes
