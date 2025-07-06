@@ -58,7 +58,7 @@ jobs:
           VITEST_REPORTER: verbose
 
       - name: Run tests with coverage
-        run: pnpm vitest run --coverage --reporter=verbose --reporter=junit
+        run: pnpm vitest run --reporter=verbose --reporter=junit
         env:
           CI: true
 
