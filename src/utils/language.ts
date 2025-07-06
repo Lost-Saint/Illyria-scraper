@@ -1,13 +1,13 @@
-import * as languagesData from "./languages.json" with { type: "json" };
+import * as languagesData from './languages.json' with { type: 'json' }
 
-const { languages, exceptions, mappings } = languagesData.default;
+const { languages, exceptions, mappings } = languagesData.default
 
 export const LanguageType = {
-  SOURCE: "source",
-  TARGET: "target",
-} as const;
+	SOURCE: 'source',
+	TARGET: 'target'
+} as const
 
-type LangType = (typeof LanguageType)[keyof typeof LanguageType];
+type LangType = (typeof LanguageType)[keyof typeof LanguageType]
 
 /**
  * Represents a valid language code in the system
@@ -30,8 +30,8 @@ type LangType = (typeof LanguageType)[keyof typeof LanguageType];
  * ```
  */
 export type LangCode<T extends LangType | void = void> = T extends LangType
-  ? Exclude<keyof typeof languages, keyof (typeof exceptions)[T]>
-  : keyof typeof languages;
+	? Exclude<keyof typeof languages, keyof (typeof exceptions)[T]>
+	: keyof typeof languages
 
 /**
  * Represents Google Translate-specific language codes
@@ -46,19 +46,14 @@ export type LangCode<T extends LangType | void = void> = T extends LangType
  * const googleCode: LangCodeGoogle = mapGoogleCode("zh");
  * ```
  */
-export type LangCodeGoogle<T extends LangCode | LangType = LangCode> =
-  T extends LangType
-    ?
-        | Exclude<LangCode<T>, keyof (typeof mappings)["request"]>
-        | keyof (typeof mappings)["response"]
-    :
-        | Exclude<T, keyof (typeof mappings)["request"]>
-        | keyof (typeof mappings)["response"];
+export type LangCodeGoogle<T extends LangCode | LangType = LangCode> = T extends LangType ?
+		| Exclude<LangCode<T>, keyof (typeof mappings)['request']>
+		| keyof (typeof mappings)['response']
+	:
+		| Exclude<T, keyof (typeof mappings)['request']>
+		| keyof (typeof mappings)['response']
 
-const isKeyOf =
-  <T extends object>(obj: T) =>
-  (key: keyof any): key is keyof T =>
-    key in obj;
+const isKeyOf = <T extends object>(obj: T) => (key: keyof any): key is keyof T => key in obj
 
 /**
  * Verifies if a string is a valid language code in our system
@@ -81,10 +76,9 @@ const isKeyOf =
  * ```
  */
 export const isValidCode = <T extends LangType>(
-  code: string | null | undefined,
-  langType?: T,
-): code is LangCode<T> =>
-  !!code && isKeyOf(languageList[langType ?? "all"])(code);
+	code: string | null | undefined,
+	langType?: T
+): code is LangCode<T> => !!code && isKeyOf(languageList[langType ?? 'all'])(code)
 
 /**
  * Replaces language codes with their exceptions based on language type
@@ -109,15 +103,15 @@ export const isValidCode = <T extends LangType>(
  * @see {@link exceptions} for the full mapping of exceptions
  */
 export const replaceExceptedCode = <T extends LangType>(
-  langType: T,
-  langCode: LangCode,
+	langType: T,
+	langCode: LangCode
 ) => {
-  const langExceptions = exceptions[langType];
-  const finalCode = isKeyOf(langExceptions)(langCode)
-    ? langExceptions[langCode]
-    : langCode;
-  return finalCode as LangCode<T>;
-};
+	const langExceptions = exceptions[langType]
+	const finalCode = isKeyOf(langExceptions)(langCode)
+		? langExceptions[langCode]
+		: langCode
+	return finalCode as LangCode<T>
+}
 
 /**
  * Maps internal language codes to Google Translate API codes
@@ -138,12 +132,12 @@ export const replaceExceptedCode = <T extends LangType>(
  * @see {@link mappings.request} for the full mapping table
  */
 export const mapGoogleCode = <T extends LangCode>(langCode: T) => {
-  const reqMappings = mappings["request"];
-  const finalCode = isKeyOf(reqMappings)(langCode)
-    ? reqMappings[langCode]
-    : langCode;
-  return finalCode as LangCodeGoogle<T>;
-};
+	const reqMappings = mappings['request']
+	const finalCode = isKeyOf(reqMappings)(langCode)
+		? reqMappings[langCode]
+		: langCode
+	return finalCode as LangCodeGoogle<T>
+}
 
 /**
  * Maps Google Translate API response codes back to internal language codes
@@ -164,14 +158,14 @@ export const mapGoogleCode = <T extends LangCode>(langCode: T) => {
  * @see {@link mappings.response} for the full mapping table
  */
 export const mapLingvaCode = <T extends LangType>(
-  langCode: LangCodeGoogle<T>,
+	langCode: LangCodeGoogle<T>
 ) => {
-  const resMappings = mappings["response"];
-  const finalCode = isKeyOf(resMappings)(langCode)
-    ? resMappings[langCode]
-    : langCode;
-  return finalCode as LangCode<T>;
-};
+	const resMappings = mappings['response']
+	const finalCode = isKeyOf(resMappings)(langCode)
+		? resMappings[langCode]
+		: langCode
+	return finalCode as LangCode<T>
+}
 
 /**
  * Creates a filtered copy of the languages object by removing exception codes for a specific language type
@@ -185,17 +179,17 @@ export const mapLingvaCode = <T extends LangType>(
  * @see {@link exceptions} for the list of exception codes by language type
  */
 const filteredLanguages = (type: LangType) => {
-  const entries = Object.entries(languages) as [LangCode, string][];
+	const entries = Object.entries(languages) as [LangCode, string][]
 
-  const filteredEntries = entries.filter(
-    ([code]) => !Object.keys(exceptions[type]).includes(code),
-  );
+	const filteredEntries = entries.filter(
+		([code]) => !Object.keys(exceptions[type]).includes(code)
+	)
 
-  return Object.fromEntries(filteredEntries) as typeof languages;
-};
+	return Object.fromEntries(filteredEntries) as typeof languages
+}
 
 export const languageList = {
-  all: languages,
-  source: filteredLanguages(LanguageType.SOURCE),
-  target: filteredLanguages(LanguageType.TARGET),
-};
+	all: languages,
+	source: filteredLanguages(LanguageType.SOURCE),
+	target: filteredLanguages(LanguageType.TARGET)
+}
