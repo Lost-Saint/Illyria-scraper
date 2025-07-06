@@ -55,16 +55,22 @@ jobs:
         env:
           CI: true
           NODE_ENV: test
+          VITEST_REPORTER: verbose
+
+      - name: Run tests with coverage
+        run: pnpm vitest run --coverage --reporter=verbose --reporter=junit
+        env:
+          CI: true
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-${{ github.run_number }}
           path: |
             coverage/
-            test-results.xml
-            junit.xml
+            test-results/
+            src/tests/
           retention-days: 7
 
       - name: Comment PR with results
@@ -90,7 +96,7 @@ jobs:
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: moderate
-          allow-licenses: GLWTS, MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC
+          allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC
 
   security-audit:
     runs-on: ubuntu-latest
