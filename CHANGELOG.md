@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.1.4
+
+### Patch Changes
+
+- 31daecf: improvemsnts to code better jsdoc comments add test
+
 ## 1.1.3
 
 ### Patch Changes
