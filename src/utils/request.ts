@@ -10,6 +10,9 @@ export const Endpoint = {
 
 type EndpointType = (typeof Endpoint)[keyof typeof Endpoint];
 
+/**
+ * Type definitions for parameters required by each endpoint
+ */
 type Params = {
   [Endpoint.INFO]: {
     body: string;
@@ -27,103 +30,88 @@ type Params = {
   };
 };
 
-const handleAxiosError = (
-  error: AxiosError,
-  endpoint: EndpointType,
-  retry: number,
-): Error => {
-  let errorMessage = `Request failed for ${endpoint} endpoint`;
-
-  if (error.response) {
-    const { status, statusText, data } = error.response;
-    errorMessage = `Server error (${status}): ${statusText}`;
-    console.error("Response error:", {
-      endpoint,
-      status,
-      statusText,
-      data,
-      headers: error.response.headers,
-      retry,
-    });
-    if (status === 429) {
-      errorMessage = "Rate limit exceeded. Please try again later.";
-    } else if (status === 403) {
-      errorMessage = "Access forbidden. Check your permissions.";
-    } else if (status === 404) {
-      errorMessage = "Resource not found.";
-    } else if (status >= 500) {
-      errorMessage = "Server error. Please try again.";
-    }
-  } else if (error.request) {
-    errorMessage = "No response received from server";
-    console.error("Request error:", {
-      endpoint,
-      request: error.request,
-      retry,
-    });
-  } else {
-    errorMessage = `Request setup error: ${error.message}`;
-    console.error("Setup error:", {
-      endpoint,
-      message: error.message,
-      retry,
-    });
-  }
-
-  console.error("Request config:", error.config);
-
-  return new Error(errorMessage);
-};
-
-const isRetryableError = (error: AxiosError): boolean => {
-  if (!error.response) return true;
-  const { status } = error.response;
-  return status >= 500 || status === 429;
-};
-
+/**
+ * Creates a request handler for a specific endpoint with built-in retry capabilities
+ *
+ * @param endpoint - The API endpoint to call
+ * @param retry - Current retry attempt number (used internally)
+ * @returns An object with methods to execute the request
+ */
 const request = <T extends EndpointType>(endpoint: T, retry: number = 0) => ({
   with: (params: Params[T]) => {
     const promise = retrieve(endpoint, params);
     return {
       promise,
+      /**
+       * Executes a callback with the response data and handles errors/retries
+       *
+       * @param callback - Function to process the API response
+       * @returns Promise resolving to the callback result or null on failure
+       */
       doing: <V>(
         callback: (res: AxiosResponse) => V | undefined,
       ): Promise<V | null> =>
         promise
-          .then(callback)
-          .catch((error: AxiosError) => {
-            const handledError = handleAxiosError(error, endpoint, retry);
-            if (isRetryableError(error) && retry < 3) {
-              console.log(
-                `Retrying ${endpoint} request (attempt ${retry + 1}/3)`,
+          .then((response) => {
+            const result = callback(response);
+
+            // Check if result is empty and we haven't exceeded max retries
+            if (isEmpty(result) && retry < 3) {
+              console.warn(
+                `Empty result for ${endpoint}, retrying (${retry + 1}/3)`,
               );
               return request(endpoint, retry + 1)
                 .with(params)
                 .doing(callback);
             }
-            throw handledError;
+
+            return result ?? null;
           })
-          .then((result) =>
-            isEmpty(result) && retry < 3
-              ? request(endpoint, retry + 1)
-                  .with(params)
-                  .doing(callback)
-              : (result ?? null),
-          ),
+          .catch((error: AxiosError) => {
+            if (error.response) {
+              console.error(
+                `${endpoint} failed:`,
+                error.response.status,
+                error.response.data,
+              );
+            } else if (error.request) {
+              console.error(`${endpoint} network error:`, error.message);
+            } else {
+              console.error(`${endpoint} error:`, error.message);
+            }
+
+            // Only retry for network errors or 5xx status codes
+            const shouldRetry = !error.response || error.response.status >= 500;
+
+            if (shouldRetry && retry < 3) {
+              console.warn(`Retrying ${endpoint} after error (${retry + 1}/3)`);
+              return request(endpoint, retry + 1)
+                .with(params)
+                .doing(callback);
+            }
+
+            return null;
+          }),
     };
   },
 });
 
 const isEmpty = (item: any) =>
-  !item || (typeof item === "object" && "length" in item && item.length <= 0);
+  !item || (Array.isArray(item) && item.length === 0);
 
+/**
+ * Makes the actual HTTP request to the specified endpoint
+ *
+ * @param endpoint - The API endpoint to call
+ * @param params - Parameters required by the endpoint
+ * @returns Promise resolving to the API response
+ * @throws Error if an invalid endpoint is provided
+ */
 const retrieve = <T extends EndpointType>(endpoint: T, params: Params[T]) => {
+  const userAgent = new UserAgent().toString();
   const baseConfig = {
-    timeout: 10000,
-    validateStatus: (status: number) => status < 500,
-    headers: {
-      "User-Agent": new UserAgent().toString(),
-    },
+    headers: { "User-Agent": userAgent },
+    timeout: 30000,
   };
 
   if (endpoint === Endpoint.INFO) {
@@ -144,7 +132,7 @@ const retrieve = <T extends EndpointType>(endpoint: T, params: Params[T]) => {
   if (endpoint === Endpoint.TEXT) {
     const { source, target, query } = params as Params[typeof Endpoint.TEXT];
     return axios.get(
-      `https://translate.google.com/m?sl=${source}&tl=${target}&q=${query}`,
+      `https://translate.google.com/m?sl=${source}&tl=${target}&q=${encodeURIComponent(query)}`,
       baseConfig,
     );
   }
@@ -153,15 +141,16 @@ const retrieve = <T extends EndpointType>(endpoint: T, params: Params[T]) => {
     const { lang, text, textLength, speed } =
       params as Params[typeof Endpoint.AUDIO];
     return axios.get(
-      `https://translate.google.com/translate_tts?tl=${lang}&q=${text}&textlen=${textLength}&speed=${speed}&client=tw-ob`,
+      `https://translate.google.com/translate_tts?tl=${lang}&q=${encodeURIComponent(text)}&textlen=${textLength}&speed=${speed}&client=tw-ob`,
       {
         ...baseConfig,
         responseType: "arraybuffer",
+        timeout: 60000, // Audio needs more time
       },
     );
   }
 
-  throw new Error("Invalid endpoint");
+  throw new Error(`Invalid endpoint: ${endpoint}`);
 };
 
 export default request;

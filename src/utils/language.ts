@@ -173,6 +173,17 @@ export const mapLingvaCode = <T extends LangType>(
   return finalCode as LangCode<T>;
 };
 
+/**
+ * Creates a filtered copy of the languages object by removing exception codes for a specific language type
+ *
+ * This is used to create separate language lists for source and target languages,
+ * each excluding their respective exception codes.
+ *
+ * @param type - Language type (source or target) to filter exceptions for
+ * @returns A copy of the languages object with exception codes removed
+ *
+ * @see {@link exceptions} for the list of exception codes by language type
+ */
 const filteredLanguages = (type: LangType) => {
   const entries = Object.entries(languages) as [LangCode, string][];
 

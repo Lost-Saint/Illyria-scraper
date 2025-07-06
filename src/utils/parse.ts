@@ -3,24 +3,13 @@ import { mapLingvaCode } from "./language.js";
 import type { TranslationInfo } from "./interfaces.js";
 
 /**
- * Type guard to check if value is a non-empty array
- */
-const isNonEmptyArray = <T>(value: unknown): value is T[] => {
-  return Array.isArray(value) && value.length > 0;
-};
-
-/**
- * Type guard to check if value is a valid string
- */
-const isValidString = (value: unknown): value is string => {
-  return typeof value === "string" && value.length > 0;
-};
-
-/**
- * Extracts detected language information from translation data
+ * Extracts the detected source language from translation data
  *
- * @param data - Array containing source, target, detected language, and extra info
- * @returns The detected source language code or undefined if not available
+ * Attempts to find the language code from multiple possible locations in the data structure,
+ * then maps it to the internal language code format.
+ *
+ * @param data - Raw translation data from Google Translate API
+ * @returns The detected source language code or undefined if not found
  */
 export const detected = ([
   source,
@@ -38,31 +27,32 @@ export const detected = ([
 };
 
 /**
- * Extracts typing correction/suggestion from translation data
+ * Extracts typo correction information from translation data
  *
- * @param source - The source language data array
- * @returns Typing suggestion or undefined if none available
+ * @param data - Raw translation data from Google Translate API
+ * @returns The typo correction text or undefined if no typo correction exists
  */
 export const typo = ([source]: Data): TranslationInfo["typo"] =>
   source?.[1]?.[0]?.[4] ?? undefined;
 
 /**
- * Functions to extract pronunciation information for both query and translation
+ * Functions for extracting pronunciation information from translation data
  */
 export const pronunciation = {
   /**
-   * Extracts pronunciation for the original query
+   * Extracts the pronunciation for the query text
    *
-   * @param source - The source language data array
-   * @returns The query pronunciation or undefined
+   * @param data - Raw translation data from Google Translate API
+   * @returns The query pronunciation or undefined if not available
    */
   query: ([source]: Data): TranslationInfo["pronunciation"]["query"] =>
     source?.[0] ?? undefined,
+
   /**
-   * Extracts pronunciation for the translated text
+   * Extracts the pronunciation for the translated text
    *
-   * @param target - The target language data array
-   * @returns The translation pronunciation or undefined
+   * @param data - Raw translation data from Google Translate API
+   * @returns The translation pronunciation or undefined if not available
    */
   translation: ([
     ,
@@ -72,15 +62,14 @@ export const pronunciation = {
 };
 
 /**
- * Collection of functions to extract detailed translation components
- * from complex nested data structures
+ * Collection of functions for extracting different types of lists from translation data
  */
 export const list = {
   /**
-   * Extracts word definitions with examples, fields, and synonyms
+   * Extracts word definitions grouped by type (e.g., noun, verb)
    *
-   * @param extra - The extra data object (fourth item in Data array)
-   * @returns Array of definition objects grouped by type
+   * @param data - Raw translation data from Google Translate API
+   * @returns Array of definition groups with their types and definition lists
    */
   definitions: ({ 3: extra }: Data): TranslationInfo["definitions"] =>
     extra?.[1]?.[0]?.map(([type, defList]) => ({
@@ -98,27 +87,32 @@ export const list = {
           }),
         ) ?? [],
     })) ?? [],
+
   /**
-   * Extracts usage examples for the translated text
+   * Extracts example sentences using the translated term
    *
-   * @param extra - The extra data object (fourth item in Data array)
-   * @returns Array of example strings
+   * @param data - Raw translation data from Google Translate API
+   * @returns Array of example sentences
    */
   examples: ({ 3: extra }: Data): TranslationInfo["examples"] =>
     extra?.[2]?.[0]?.map(([, item]) => item) ?? [],
+
   /**
-   * Extracts words/phrases similar to the query
+   * Extracts words with similar meaning to the query
    *
-   * @param extra - The extra data object (fourth item in Data array)
-   * @returns Array of similar words/phrases
+   * @param data - Raw translation data from Google Translate API
+   * @returns Array of similar words
    */
   similar: ({ 3: extra }: Data): TranslationInfo["similar"] =>
     extra?.[3]?.[0] ?? [],
+
   /**
-   * Extracts additional translations grouped by type with meanings and frequency
+   * Extracts additional translations grouped by type (e.g., noun, verb)
    *
-   * @param extra - The extra data object (fourth item in Data array)
-   * @returns Array of translation objects grouped by type
+   * Includes word frequency information where 1 is most frequent and 4 is least frequent.
+   *
+   * @param data - Raw translation data from Google Translate API
+   * @returns Array of translation groups with their types and word lists
    */
   translations: ({ 3: extra }: Data): TranslationInfo["extraTranslations"] =>
     extra?.[5]?.[0]?.map(([type, transList]) => ({
@@ -133,20 +127,30 @@ export const list = {
     })) ?? [],
 };
 
+/**
+ * Type for objects that can be filtered for undefined values
+ */
 type GenericObject<T> = { [k: string]: T } | Array<T>;
 
+/**
+ * Checks if a value is an object (including arrays)
+ *
+ * @param value - Value to check
+ * @returns Type guard asserting the value is an object or array
+ */
 const isObject = (
   value: unknown,
 ): value is GenericObject<object | string | number> =>
   typeof value === "object";
 
 /**
- * Recursively removes undefined fields from objects and filters out falsy values from arrays
+ * Recursively filters out undefined values from an object or array
  *
- * @template T - Object or array type with potentially undefined values
- * @template V - The value type contained in the object or array
+ * This function helps create cleaner output data by removing all undefined
+ * fields that would otherwise clutter the result.
+ *
  * @param obj - Object or array to process
- * @returns New object or array with undefined fields removed
+ * @returns A new object or array with all undefined values removed
  */
 export const undefinedFields = <T extends GenericObject<V | undefined>, V>(
   obj: T,
