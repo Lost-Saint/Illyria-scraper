@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.1.3
+
+### Patch Changes
+
+- 121780e: Update dependencies to latest versions
+
 ## 1.1.2
 
 ### Patch Changes
