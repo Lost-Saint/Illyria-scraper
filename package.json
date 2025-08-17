@@ -43,15 +43,15 @@
 	"type": "module",
 	"devDependencies": {
 		"@arethetypeswrong/cli": "^0.18.2",
-		"@changesets/cli": "^2.29.5",
+		"@changesets/cli": "^2.29.6",
 		"@types/user-agents": "^1.0.4",
 		"dprint": "^0.50.1",
-		"typescript": "^5.8.3",
+		"typescript": "^5.9.2",
 		"vitest": "^3.2.4"
 	},
 	"dependencies": {
 		"axios": "^1.11.0",
 		"cheerio": "^1.1.2",
-		"user-agents": "^1.1.617"
+		"user-agents": "^1.1.633"
 	}
 }
