@@ -52,6 +52,6 @@
 	"dependencies": {
 		"axios": "^1.11.0",
 		"cheerio": "^1.1.2",
-		"user-agents": "^1.1.633"
+		"user-agents": "^1.1.645"
 	}
 }
