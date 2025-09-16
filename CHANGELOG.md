@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.1.6
+
+### Patch Changes
+
+- 626d281: update deps to latest
+
 ## 1.1.5
 
 ### Patch Changes
