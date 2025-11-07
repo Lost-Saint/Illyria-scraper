@@ -1,5 +1,11 @@
 # illyria-scraper
 
+## 1.1.7
+
+### Patch Changes
+
+- e567ea2: chore(deps): update to latest
+
 ## 1.1.6
 
 ### Patch Changes
