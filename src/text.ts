@@ -1,6 +1,6 @@
-import * as cheerio from "cheerio";
-import { mapGoogleCode, type LangCode } from "./utils/language.js";
-import request, { Endpoint } from "./utils/request.js";
+import * as cheerio from 'cheerio'
+import { mapGoogleCode, type LangCode } from './utils/language.js'
+import request, { Endpoint } from './utils/request.js'
 
 /**
  * Translates text from source language to target language using Google Translate
@@ -11,26 +11,26 @@ import request, { Endpoint } from "./utils/request.js";
  * @returns Promise resolving to translated text or null if translation failed or text is too long
  */
 export const getTranslationText = async (
-  source: LangCode<"source">,
-  target: LangCode<"target">,
-  query: string,
+	source: LangCode<'source'>,
+	target: LangCode<'target'>,
+	query: string
 ): Promise<string | null> => {
-  const parsedSource = mapGoogleCode(source);
-  const parsedTarget = mapGoogleCode(target);
+	const parsedSource = mapGoogleCode(source)
+	const parsedTarget = mapGoogleCode(target)
 
-  if (query.length > 7500) {
-    return null;
-  }
+	if (query.length > 7500) {
+		return null
+	}
 
-  return request(Endpoint.TEXT)
-    .with({ source: parsedSource, target: parsedTarget, query })
-    .doing((data) => {
-      const $ = cheerio.load(data);
+	return request(Endpoint.TEXT)
+		.with({ source: parsedSource, target: parsedTarget, query })
+		.doing((data) => {
+			const $ = cheerio.load(data)
 
-      const translation = $(".result-container").text()?.trim();
+			const translation = $('.result-container').text()?.trim()
 
-      return translation && !translation.includes("#af-error-page")
-        ? translation
-        : undefined;
-    });
-};
+			return translation && !translation.includes('#af-error-page')
+				? translation
+				: undefined
+		})
+}
