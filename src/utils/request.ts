@@ -1,156 +1,123 @@
-import axios, { type AxiosResponse, type AxiosError } from 'axios'
-import UserAgent from 'user-agents'
-import type { LangCodeGoogle } from './language.js'
+import UserAgent from "user-agents";
+import type { LangCodeGoogle } from "./language.js";
 
 export const Endpoint = {
-	INFO: 'info',
-	TEXT: 'text',
-	AUDIO: 'audio'
-} as const
+  INFO: "info",
+  TEXT: "text",
+  AUDIO: "audio",
+} as const;
 
-type EndpointType = (typeof Endpoint)[keyof typeof Endpoint]
+type EndpointType = (typeof Endpoint)[keyof typeof Endpoint];
 
-/**
- * Type definitions for parameters required by each endpoint
- */
 type Params = {
-	[Endpoint.INFO]: {
-		body: string
-	}
-	[Endpoint.TEXT]: {
-		source: LangCodeGoogle<'source'>
-		target: LangCodeGoogle<'target'>
-		query: string
-	}
-	[Endpoint.AUDIO]: {
-		lang: LangCodeGoogle<'target'>
-		text: string
-		textLength: number
-		speed: number
-	}
-}
+  [Endpoint.INFO]: { body: string };
+  [Endpoint.TEXT]: {
+    source: LangCodeGoogle<"source">;
+    target: LangCodeGoogle<"target">;
+    query: string;
+  };
+  [Endpoint.AUDIO]: {
+    lang: LangCodeGoogle<"target">;
+    text: string;
+    textLength: number;
+    speed: number;
+  };
+};
 
-/**
- * Creates a request handler for a specific endpoint with built-in retry capabilities
- *
- * @param endpoint - The API endpoint to call
- * @param retry - Current retry attempt number (used internally)
- * @returns An object with methods to execute the request
- */
-const request = <T extends EndpointType>(endpoint: T, retry: number = 0) => ({
-	with: (params: Params[T]) => {
-		const promise = retrieve(endpoint, params)
-		return {
-			promise,
-			/**
-			 * Executes a callback with the response data and handles errors/retries
-			 *
-			 * @param callback - Function to process the API response
-			 * @returns Promise resolving to the callback result or null on failure
-			 */
-			doing: <V>(
-				callback: (res: AxiosResponse) => V | undefined
-			): Promise<V | null> =>
-				promise
-					.then((response) => {
-						const result = callback(response)
+// ─────────────────────────────────────────────────────────────
+// Simple, clean, modern native fetch version (best practices)
+// ─────────────────────────────────────────────────────────────
+const request = <T extends EndpointType>(endpoint: T, retry = 0) => ({
+  with: (params: Params[T]) => {
+    const promise = retrieve(endpoint, params);
 
-						// Check if result is empty and we haven't exceeded max retries
-						if (isEmpty(result) && retry < 3) {
-							console.warn(
-								`Empty result for ${endpoint}, retrying (${retry + 1}/3)`
-							)
-							return request(endpoint, retry + 1)
-								.with(params)
-								.doing(callback)
-						}
+    return {
+      promise,
+      doing: <V>(
+        callback: (data: string | ArrayBuffer) => V | undefined,
+      ): Promise<V | null> =>
+        promise
+          .then(callback)
+          .catch(() => undefined)
+          .then((result) =>
+            isEmpty(result) && retry < 3
+              ? request(endpoint, retry + 1)
+                  .with(params)
+                  .doing(callback)
+              : (result ?? null),
+          ),
+    };
+  },
+});
 
-						return result ?? null
-					})
-					.catch((error: AxiosError) => {
-						if (error.response) {
-							console.error(
-								`${endpoint} failed:`,
-								error.response.status,
-								error.response.data
-							)
-						} else if (error.request) {
-							console.error(`${endpoint} network error:`, error.message)
-						} else {
-							console.error(`${endpoint} error:`, error.message)
-						}
+const isEmpty = (item: unknown): boolean => {
+  if (item == null) return true;
+  if (typeof item === "number" || typeof item === "boolean") return false;
+  if (item instanceof Map || item instanceof Set) return item.size === 0;
+  if (typeof item === "object") return Object.keys(item as object).length === 0;
+  return !item;
+};
 
-						// Only retry for network errors or 5xx status codes
-						const shouldRetry = !error.response || error.response.status >= 500
+const retrieve = async <T extends EndpointType>(
+  endpoint: T,
+  params: Params[T],
+): Promise<string | ArrayBuffer> => {
+  const ua = new UserAgent().toString();
 
-						if (shouldRetry && retry < 3) {
-							console.warn(`Retrying ${endpoint} after error (${retry + 1}/3)`)
-							return request(endpoint, retry + 1)
-								.with(params)
-								.doing(callback)
-						}
+  if (endpoint === Endpoint.INFO) {
+    const { body } = params as Params[typeof Endpoint.INFO];
 
-						return null
-					})
-		}
-	}
-})
+    const res = await fetch(
+      "https://translate.google.com/_/TranslateWebserverUi/data/batchexecute?rpcids=MkEWBc&rt=c",
+      {
+        method: "POST",
+        body,
+        headers: {
+          "User-Agent": ua,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      },
+    );
 
-const isEmpty = (item: any) => !item || (Array.isArray(item) && item.length === 0)
+    return res.text(); // Google returns plain text
+  }
 
-/**
- * Makes the actual HTTP request to the specified endpoint
- *
- * @param endpoint - The API endpoint to call
- * @param params - Parameters required by the endpoint
- * @returns Promise resolving to the API response
- * @throws Error if an invalid endpoint is provided
- */
-const retrieve = <T extends EndpointType>(endpoint: T, params: Params[T]) => {
-	const userAgent = new UserAgent().toString()
-	const baseConfig = {
-		headers: { 'User-Agent': userAgent },
-		timeout: 30000
-	}
+  if (endpoint === Endpoint.TEXT) {
+    const { source, target, query } = params as Params[typeof Endpoint.TEXT];
 
-	if (endpoint === Endpoint.INFO) {
-		const { body } = params as Params[typeof Endpoint.INFO]
-		return axios.post(
-			'https://translate.google.com/_/TranslateWebserverUi/data/batchexecute?rpcids=MkEWBc&rt=c',
-			body,
-			{
-				...baseConfig,
-				headers: {
-					...baseConfig.headers,
-					'Content-Type': 'application/x-www-form-urlencoded'
-				}
-			}
-		)
-	}
+    // Best practice: proper URL encoding with URL + searchParams
+    const url = new URL("https://translate.google.com/m");
+    url.searchParams.set("sl", source);
+    url.searchParams.set("tl", target);
+    url.searchParams.set("q", query);
 
-	if (endpoint === Endpoint.TEXT) {
-		const { source, target, query } = params as Params[typeof Endpoint.TEXT]
-		return axios.get(
-			`https://translate.google.com/m?sl=${source}&tl=${target}&q=${encodeURIComponent(query)}`,
-			baseConfig
-		)
-	}
+    const res = await fetch(url.toString(), {
+      headers: { "User-Agent": ua },
+    });
 
-	if (endpoint === Endpoint.AUDIO) {
-		const { lang, text, textLength, speed } = params as Params[typeof Endpoint.AUDIO]
-		return axios.get(
-			`https://translate.google.com/translate_tts?tl=${lang}&q=${
-				encodeURIComponent(text)
-			}&textlen=${textLength}&speed=${speed}&client=tw-ob`,
-			{
-				...baseConfig,
-				responseType: 'arraybuffer',
-				timeout: 60000 // Audio needs more time
-			}
-		)
-	}
+    return res.text();
+  }
 
-	throw new Error(`Invalid endpoint: ${endpoint}`)
-}
+  if (endpoint === Endpoint.AUDIO) {
+    const { lang, text, textLength, speed } =
+      params as Params[typeof Endpoint.AUDIO];
 
-export default request
+    // Best practice: proper URL encoding
+    const url = new URL("https://translate.google.com/translate_tts");
+    url.searchParams.set("tl", lang);
+    url.searchParams.set("q", text);
+    url.searchParams.set("textlen", textLength.toString());
+    url.searchParams.set("speed", speed.toString());
+    url.searchParams.set("client", "tw-ob");
+
+    const res = await fetch(url.toString(), {
+      headers: { "User-Agent": ua },
+    });
+
+    return res.arrayBuffer(); // binary MP3
+  }
+
+  throw new Error("Invalid endpoint");
+};
+
+export default request;
